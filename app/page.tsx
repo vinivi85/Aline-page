@@ -109,7 +109,7 @@ export default function Home() {
             },
             {
               label: "Substack",
-              href: "#",
+              href: "https://substack.com/@alinevicente",
               bg: "#FF6719",
               icon: (
                 <svg viewBox="0 0 24 24" className="w-7 h-7" fill="white">
