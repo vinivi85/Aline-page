@@ -85,17 +85,49 @@ export default function Home() {
         </h2>
         <div className="flex flex-wrap justify-center gap-4">
           {[
-            { label: "YouTube", href: "#" },
-            { label: "Instagram", href: "#" },
-            { label: "Substack", href: "#" },
+            {
+              label: "YouTube",
+              href: "#",
+              bg: "#FF0000",
+              icon: (
+                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="white">
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12Z" />
+                </svg>
+              ),
+            },
+            {
+              label: "Instagram",
+              href: "#",
+              bg: "linear-gradient(45deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)",
+              icon: (
+                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="white" strokeWidth="1.8">
+                  <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+                  <circle cx="12" cy="12" r="4.3" />
+                  <circle cx="17.4" cy="6.6" r="1.1" fill="white" stroke="none" />
+                </svg>
+              ),
+            },
+            {
+              label: "Substack",
+              href: "#",
+              bg: "#FF6719",
+              icon: (
+                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="white">
+                  <path d="M3 3h18v3.6H3V3Zm0 5.6h18v3.6H3V8.6ZM3 14.2h18V21L12 16.4 3 21v-6.8Z" />
+                </svg>
+              ),
+            },
           ].map((item) => (
             <a
               key={item.label}
               href={item.href}
               className="w-40 rounded-2xl border border-[var(--color-border)] py-8 flex flex-col items-center gap-3 hover:border-[var(--color-teal)] transition-colors"
             >
-              <span className="w-14 h-14 rounded-full bg-[var(--color-teal-light)] flex items-center justify-center text-[var(--color-teal)] font-display font-semibold">
-                {item.label[0]}
+              <span
+                className="w-14 h-14 rounded-full flex items-center justify-center"
+                style={{ background: item.bg }}
+              >
+                {item.icon}
               </span>
               <span className="font-display font-medium text-[var(--color-ink)]">
                 {item.label}
