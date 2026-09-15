@@ -19,7 +19,11 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError("E-mail ou senha inválidos.");
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setError("E-mail ainda não confirmado. Confirme o usuário no painel do Supabase (Authentication → Users) e tente de novo.");
+      } else {
+        setError(`Erro ao entrar: ${error.message}`);
+      }
       return;
     }
     router.push("/admin");
