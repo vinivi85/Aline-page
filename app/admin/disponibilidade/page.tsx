@@ -24,7 +24,11 @@ export default async function DisponibilidadePage() {
         específicas quando precisar (férias, feriado, um horário extra pontual).
       </p>
 
-      <h2 className="font-display text-lg mb-3 text-[var(--color-ink)]">Horários recorrentes</h2>
+      <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Horários recorrentes</h2>
+      <p className="text-xs text-[var(--color-ink-soft)] mb-3">
+        Preencha o horário e clique em <strong>Salvar</strong> — cada faixa é gravada
+        individualmente assim que você clica no botão daquele dia.
+      </p>
       <div className="flex flex-col gap-3 mb-6">
         {DAYS.map((dayName, dayIndex) => (
           <div key={dayIndex} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
@@ -55,8 +59,8 @@ export default async function DisponibilidadePage() {
                 Até
                 <input name="end_time" type="time" required className="block mt-1 rounded border border-[var(--color-border)] px-2 py-1 text-sm" />
               </label>
-              <button type="submit" className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs text-[var(--color-ink)] hover:border-[var(--color-wine)]">
-                + Adicionar faixa
+              <button type="submit" className="rounded-lg bg-[var(--color-teal)] hover:bg-[var(--color-teal-dark)] transition-colors px-4 py-1.5 text-xs font-semibold text-white">
+                Salvar horário
               </button>
             </form>
           </div>
@@ -109,8 +113,8 @@ export default async function DisponibilidadePage() {
           Motivo (opcional)
           <input name="reason" className="mt-1 w-full rounded border border-[var(--color-border)] px-2 py-1.5 text-sm" placeholder="ex: viagem, feriado" />
         </label>
-        <button type="submit" className="col-span-2 sm:col-span-4 rounded-lg bg-[var(--color-wine)] px-4 py-2 text-white text-sm w-fit">
-          Adicionar exceção
+        <button type="submit" className="col-span-2 sm:col-span-4 rounded-lg bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors px-4 py-2 text-white text-sm font-semibold w-fit">
+          Salvar exceção
         </button>
       </form>
     </div>
