@@ -1,7 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { format, isSameDay, parseISO } from "date-fns";
+import {
+  format,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  isBefore,
+  parseISO,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  addMonths,
+  subMonths,
+  startOfDay,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 type SessionType = {
@@ -15,9 +30,12 @@ type SessionType = {
 
 type Slot = { start: string; end: string };
 
+const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+
 export default function BookingFlow({ sessionType }: { sessionType: SessionType }) {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [step, setStep] = useState<"calendar" | "form">("calendar");
@@ -37,18 +55,38 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
   }, [sessionType.id]);
 
   const daysWithSlots = useMemo(() => {
-    const map = new Map<string, Date>();
-    for (const s of slots) {
-      const d = parseISO(s.start);
-      map.set(format(d, "yyyy-MM-dd"), d);
-    }
-    return Array.from(map.values()).sort((a, b) => a.getTime() - b.getTime());
+    const set = new Set<string>();
+    for (const s of slots) set.add(format(parseISO(s.start), "yyyy-MM-dd"));
+    return set;
   }, [slots]);
 
   const timesForSelectedDay = useMemo(() => {
     if (!selectedDay) return [];
     return slots.filter((s) => isSameDay(parseISO(s.start), selectedDay));
   }, [slots, selectedDay]);
+
+  // grade do calendário: sempre semanas completas (dom-sáb) cobrindo o mês visível
+  const calendarDays = useMemo(() => {
+    const start = startOfWeek(startOfMonth(visibleMonth));
+    const end = endOfWeek(endOfMonth(visibleMonth));
+    return eachDayOfInterval({ start, end });
+  }, [visibleMonth]);
+
+  const today = startOfDay(new Date());
+
+  function goToPrevMonth() {
+    const prev = subMonths(visibleMonth, 1);
+    // não deixa voltar antes do mês atual
+    if (isBefore(startOfMonth(new Date()), prev) || isSameMonth(prev, new Date())) {
+      setVisibleMonth(startOfMonth(prev));
+    }
+  }
+
+  function goToNextMonth() {
+    setVisibleMonth(startOfMonth(addMonths(visibleMonth, 1)));
+  }
+
+  const isPrevDisabled = isSameMonth(visibleMonth, new Date());
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,7 +126,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
       <div className="grid gap-10 sm:grid-cols-[280px_1fr]">
         {/* Painel esquerdo: detalhes da sessão */}
         <div className="border-b sm:border-b-0 sm:border-r border-[var(--color-border)] pb-8 sm:pb-0 sm:pr-8">
-          <p className="text-sm text-[var(--color-wine)] mb-2">Aline Vicente</p>
+          <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente</p>
           <h1 className="font-display text-2xl mb-3 text-[var(--color-ink)]">{sessionType.name}</h1>
           {sessionType.description && (
             <p className="text-[var(--color-ink-soft)] text-sm mb-4">{sessionType.description}</p>
@@ -117,48 +155,87 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
           )}
         </div>
 
-        {/* Painel direito: calendário/horários ou formulário */}
+        {/* Painel direito: calendário mensal ou formulário */}
         <div>
           {loading && <p className="text-[var(--color-ink-soft)]">Carregando horários...</p>}
 
           {!loading && step === "calendar" && (
             <div>
-              <h2 className="font-display text-lg mb-4 text-[var(--color-ink)]">
-                Selecione uma data
-              </h2>
-              {daysWithSlots.length === 0 ? (
-                <p className="text-[var(--color-ink-soft)]">
-                  Sem horários disponíveis no momento. Volte em breve.
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={goToPrevMonth}
+                  disabled={isPrevDisabled}
+                  className="w-8 h-8 rounded-full border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink)] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[var(--color-teal)]"
+                  aria-label="Mês anterior"
+                >
+                  ‹
+                </button>
+                <h2 className="font-display text-lg text-[var(--color-ink)] capitalize">
+                  {format(visibleMonth, "MMMM yyyy", { locale: ptBR })}
+                </h2>
+                <button
+                  onClick={goToNextMonth}
+                  className="w-8 h-8 rounded-full border border-[var(--color-border)] flex items-center justify-center text-[var(--color-ink)] hover:border-[var(--color-teal)]"
+                  aria-label="Próximo mês"
+                >
+                  ›
+                </button>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {WEEKDAY_LABELS.map((d, i) => (
+                  <div key={i} className="text-center text-xs text-[var(--color-ink-soft)] py-1">
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mb-8">
+                {calendarDays.map((day) => {
+                  const dateKey = format(day, "yyyy-MM-dd");
+                  const inMonth = isSameMonth(day, visibleMonth);
+                  const hasSlots = daysWithSlots.has(dateKey);
+                  const isPast = isBefore(day, today);
+                  const disabled = !inMonth || !hasSlots || isPast;
+                  const isSelected = selectedDay && isSameDay(day, selectedDay);
+
+                  return (
+                    <button
+                      key={dateKey}
+                      disabled={disabled}
+                      onClick={() => {
+                        setSelectedDay(day);
+                        setSelectedSlot(null);
+                      }}
+                      className={`aspect-square rounded-lg text-sm flex flex-col items-center justify-center transition-colors relative
+                        ${!inMonth ? "invisible" : ""}
+                        ${
+                          disabled && inMonth
+                            ? "text-[var(--color-border)] cursor-default"
+                            : "text-[var(--color-ink)] hover:bg-[var(--color-teal-light)] cursor-pointer"
+                        }
+                        ${isSelected ? "bg-[var(--color-teal)] text-white hover:bg-[var(--color-teal)]" : ""}
+                        ${isToday(day) && !isSelected ? "font-bold" : ""}
+                      `}
+                    >
+                      {format(day, "d")}
+                      {hasSlots && !isPast && inMonth && !isSelected && (
+                        <span className="w-1 h-1 rounded-full bg-[var(--color-orange)] absolute bottom-1.5" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {!loading && daysWithSlots.size === 0 && (
+                <p className="text-sm text-[var(--color-ink-soft)] mb-8">
+                  Sem horários disponíveis nos próximos meses. Volte em breve.
                 </p>
-              ) : (
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {daysWithSlots.map((d) => {
-                    const isSelected = selectedDay && isSameDay(d, selectedDay);
-                    return (
-                      <button
-                        key={d.toISOString()}
-                        onClick={() => {
-                          setSelectedDay(d);
-                          setSelectedSlot(null);
-                        }}
-                        className={`rounded-lg border px-4 py-3 text-sm text-left min-w-[92px] transition-colors ${
-                          isSelected
-                            ? "border-[var(--color-wine)] bg-[var(--color-wine)] text-white"
-                            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-wine)]"
-                        }`}
-                      >
-                        <div className="capitalize">{format(d, "EEE", { locale: ptBR })}</div>
-                        <div className="font-display text-lg">{format(d, "d")}</div>
-                        <div className="text-xs opacity-80">{format(d, "MMM", { locale: ptBR })}</div>
-                      </button>
-                    );
-                  })}
-                </div>
               )}
 
               {selectedDay && (
                 <div>
-                  <h3 className="font-display text-lg mb-3 text-[var(--color-ink)]">
+                  <h3 className="font-display text-lg mb-3 text-[var(--color-ink)] capitalize">
                     Horários em {format(selectedDay, "d 'de' MMMM", { locale: ptBR })}
                   </h3>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -168,8 +245,8 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                         onClick={() => setSelectedSlot(s)}
                         className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
                           selectedSlot?.start === s.start
-                            ? "border-[var(--color-wine)] bg-[var(--color-wine)] text-white"
-                            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-wine)]"
+                            ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
+                            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal)]"
                         }`}
                       >
                         {format(parseISO(s.start), "HH:mm")}
@@ -180,7 +257,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                   <button
                     disabled={!selectedSlot}
                     onClick={() => setStep("form")}
-                    className="mt-8 w-full sm:w-auto rounded-lg bg-[var(--color-wine)] px-6 py-3 text-white text-sm font-medium disabled:opacity-40 hover:bg-[var(--color-wine-dark)] transition-colors"
+                    className="mt-8 w-full sm:w-auto rounded-lg bg-[var(--color-orange)] px-6 py-3 text-white text-sm font-semibold disabled:opacity-40 hover:bg-[var(--color-orange-dark)] transition-colors"
                   >
                     Continuar
                   </button>
@@ -194,7 +271,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
               <button
                 type="button"
                 onClick={() => setStep("calendar")}
-                className="text-sm text-[var(--color-wine)] text-left mb-2"
+                className="text-sm text-[var(--color-teal)] text-left mb-2"
               >
                 ← Trocar horário
               </button>
@@ -238,7 +315,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                     onClick={() => setPaymentMethod("card")}
                     className={`flex-1 rounded-lg border px-3 py-2 text-sm ${
                       paymentMethod === "card"
-                        ? "border-[var(--color-wine)] bg-[var(--color-wine)] text-white"
+                        ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
                         : "border-[var(--color-border)] bg-[var(--color-surface)]"
                     }`}
                   >
@@ -249,7 +326,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                     onClick={() => setPaymentMethod("pix")}
                     className={`flex-1 rounded-lg border px-3 py-2 text-sm ${
                       paymentMethod === "pix"
-                        ? "border-[var(--color-wine)] bg-[var(--color-wine)] text-white"
+                        ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
                         : "border-[var(--color-border)] bg-[var(--color-surface)]"
                     }`}
                   >
@@ -263,7 +340,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-2 rounded-lg bg-[var(--color-wine)] px-6 py-3 text-white text-sm font-medium disabled:opacity-40 hover:bg-[var(--color-wine-dark)] transition-colors"
+                className="mt-2 rounded-lg bg-[var(--color-orange)] px-6 py-3 text-white text-sm font-semibold disabled:opacity-40 hover:bg-[var(--color-orange-dark)] transition-colors"
               >
                 {submitting ? "Redirecionando..." : "Ir para pagamento"}
               </button>

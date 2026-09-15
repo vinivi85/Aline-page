@@ -52,6 +52,13 @@ export async function toggleAvailabilityRule(dayOfWeek: number, startTime: strin
   revalidatePath("/admin/disponibilidade");
 }
 
+export async function toggleMonth(period: string, enabled: boolean) {
+  const supabase = createServiceClient();
+  await supabase.from("month_availability").upsert({ period, enabled }, { onConflict: "period" });
+  revalidatePath("/admin/disponibilidade");
+  revalidatePath("/agendar");
+}
+
 export async function addAvailabilityRule(formData: FormData) {
   const supabase = createServiceClient();
   await supabase.from("availability_rules").insert({

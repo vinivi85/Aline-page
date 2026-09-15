@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { computeAvailableSlots } from "@/lib/availability";
+import { format } from "date-fns";
 
 export async function GET(req: NextRequest) {
   const sessionTypeId = req.nextUrl.searchParams.get("sessionTypeId");
@@ -10,12 +11,13 @@ export async function GET(req: NextRequest) {
 
   const supabase = createServiceClient();
 
-  const [{ data: sessionType }, { data: rules }, { data: overrides }, { data: settingsRow }] =
+  const [{ data: sessionType }, { data: rules }, { data: overrides }, { data: settingsRow }, { data: monthRows }] =
     await Promise.all([
       supabase.from("session_types").select("*").eq("id", sessionTypeId).single(),
       supabase.from("availability_rules").select("*").eq("active", true),
       supabase.from("availability_overrides").select("*"),
       supabase.from("booking_settings").select("*").eq("id", 1).single(),
+      supabase.from("month_availability").select("*"),
     ]);
 
   if (!sessionType) {
@@ -27,13 +29,17 @@ export async function GET(req: NextRequest) {
     .select("start_at, end_at")
     .in("status", ["pending_payment", "confirmed"]);
 
+  const disabledMonths = new Set(
+    (monthRows ?? []).filter((m: any) => m.enabled === false).map((m: any) => m.period)
+  );
+
   const slots = computeAvailableSlots({
     rules: rules ?? [],
     overrides: (overrides ?? []).map((o: any) => ({ ...o, date: String(o.date) })),
     existingBookings: existingBookings ?? [],
     settings: settingsRow!,
     sessionDurationMinutes: sessionType.duration_minutes,
-  });
+  }).filter((s) => !disabledMonths.has(format(s.start, "yyyy-MM")));
 
   return NextResponse.json({
     sessionType,

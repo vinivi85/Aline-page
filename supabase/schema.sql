@@ -87,3 +87,12 @@ create index idx_bookings_status on bookings(status);
 create unique index idx_bookings_no_overlap
   on bookings (start_at)
   where status in ('pending_payment', 'confirmed');
+
+-- Controle de quais meses ficam abertos para agendamento (visão macro,
+-- além dos dias/horários específicos). Ausência de linha = mês aberto por padrão;
+-- só precisa de registro quando um mês é explicitamente fechado.
+create table month_availability (
+  period text primary key,  -- formato 'YYYY-MM', ex: '2026-11'
+  enabled boolean not null default true,
+  created_at timestamptz not null default now()
+);
