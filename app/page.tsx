@@ -87,7 +87,7 @@ export default function Home() {
           {[
             {
               label: "YouTube",
-              href: "#",
+              href: "https://www.youtube.com/@AlineVicente",
               bg: "#FF0000",
               icon: (
                 <svg viewBox="0 0 24 24" className="w-7 h-7" fill="white">
@@ -97,7 +97,7 @@ export default function Home() {
             },
             {
               label: "Instagram",
-              href: "#",
+              href: "https://instagram.com/aline.mvicente",
               bg: "linear-gradient(45deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5)",
               icon: (
                 <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="white" strokeWidth="1.8">
