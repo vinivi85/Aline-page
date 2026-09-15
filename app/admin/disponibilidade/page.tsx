@@ -38,7 +38,9 @@ export default async function DisponibilidadePage() {
       <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Meses disponíveis</h2>
       <p className="text-xs text-[var(--color-ink-soft)] mb-3">
         Desative um mês inteiro se você não vai atender nesse período (ex: fim de ano). Por
-        padrão todo mês fica aberto.
+        padrão todo mês fica aberto. <strong>Dica:</strong> pra abrir só datas específicas num
+        mês (ex: só dia 20 e 28), feche o mês inteiro aqui e depois adicione cada data como
+        "Abrir horário extra" na seção de exceções pontuais, mais abaixo.
       </p>
       <div className="flex flex-wrap gap-2 mb-10">
         {upcomingMonths.map(({ period, date }) => {
@@ -113,7 +115,8 @@ export default async function DisponibilidadePage() {
       <h2 className="font-display text-lg mb-3 text-[var(--color-ink)]">Exceções pontuais</h2>
       <p className="text-xs text-[var(--color-ink-soft)] mb-3">
         Use para bloquear um dia inteiro (viagem, feriado), bloquear uma faixa de horário num dia
-        específico, ou abrir um horário extra fora da rotina normal.
+        específico, ou abrir um horário extra fora da rotina normal — inclusive dentro de um mês
+        que você fechou acima (a data específica sempre tem prioridade sobre o mês fechado).
       </p>
 
       <div className="flex flex-col gap-2 mb-4">

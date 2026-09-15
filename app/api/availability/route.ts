@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { computeAvailableSlots } from "@/lib/availability";
-import { format } from "date-fns";
 
 export async function GET(req: NextRequest) {
   const sessionTypeId = req.nextUrl.searchParams.get("sessionTypeId");
@@ -29,8 +28,8 @@ export async function GET(req: NextRequest) {
     .select("start_at, end_at")
     .in("status", ["pending_payment", "confirmed"]);
 
-  const disabledMonths = new Set(
-    (monthRows ?? []).filter((m: any) => m.enabled === false).map((m: any) => m.period)
+  const disabledMonths = new Set<string>(
+    (monthRows ?? []).filter((m: any) => m.enabled === false).map((m: any) => String(m.period))
   );
 
   const slots = computeAvailableSlots({
@@ -39,7 +38,8 @@ export async function GET(req: NextRequest) {
     existingBookings: existingBookings ?? [],
     settings: settingsRow!,
     sessionDurationMinutes: sessionType.duration_minutes,
-  }).filter((s) => !disabledMonths.has(format(s.start, "yyyy-MM")));
+    disabledMonths,
+  });
 
   return NextResponse.json({
     sessionType,

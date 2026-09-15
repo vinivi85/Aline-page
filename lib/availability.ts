@@ -37,6 +37,9 @@ function timeToMinutes(t: string) {
  * Gera todos os horários disponíveis para um tipo de sessão dentro da janela
  * [today, today + max_days_ahead], considerando:
  * - regras recorrentes de disponibilidade (dia da semana + faixa de horário)
+ * - meses fechados no admin (fecham as regras recorrentes daquele mês, mas
+ *   não apagam aberturas pontuais — assim dá pra fechar o mês inteiro e abrir
+ *   só datas específicas dentro dele)
  * - overrides pontuais (bloqueio de dia, bloqueio de faixa, abertura extra)
  * - agendamentos já existentes (para não sobrepor)
  * - buffer entre sessões e antecedência mínima
@@ -47,9 +50,11 @@ export function computeAvailableSlots(params: {
   existingBookings: ExistingBooking[];
   settings: BookingSettings;
   sessionDurationMinutes: number;
+  disabledMonths?: Set<string>; // formato 'yyyy-MM'
   now?: Date;
 }): Slot[] {
   const { rules, overrides, existingBookings, settings, sessionDurationMinutes } = params;
+  const disabledMonths = params.disabledMonths ?? new Set<string>();
   const now = params.now ?? new Date();
   const earliestStart = addMinutes(now, settings.min_notice_hours * 60);
   const lastDay = addDays(startOfDay(now), settings.max_days_ahead);
@@ -73,10 +78,14 @@ export function computeAvailableSlots(params: {
 
     if (dayOverrides.some((o) => o.type === "block_day")) continue;
 
+    const monthClosed = disabledMonths.has(format(day, "yyyy-MM"));
     const dayOfWeek = day.getDay();
-    const dayRules = rules.filter((r) => r.active && r.day_of_week === dayOfWeek);
+    const dayRules = monthClosed
+      ? []
+      : rules.filter((r) => r.active && r.day_of_week === dayOfWeek);
 
-    // Janelas base do dia: regras recorrentes + aberturas extras pontuais
+    // Janelas base do dia: regras recorrentes (se o mês não estiver fechado)
+    // + aberturas extras pontuais (essas sempre valem, mesmo com o mês fechado)
     const windows: { start: number; end: number }[] = dayRules.map((r) => ({
       start: timeToMinutes(r.start_time),
       end: timeToMinutes(r.end_time),
