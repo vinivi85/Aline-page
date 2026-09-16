@@ -1,6 +1,19 @@
+import Link from "next/link";
 import { createServiceClient } from "@/lib/supabase/server";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+function googleCalendarUrl(booking: any) {
+  const toGoogleDate = (iso: string) => iso.replace(/[-:]/g, "").split(".")[0] + "Z";
+  const title = encodeURIComponent(`${booking.session_types?.name ?? "Sessão"} — Aline Vicente`);
+  const details = encodeURIComponent(
+    booking.zoom_join_url
+      ? `Link do Zoom: ${booking.zoom_join_url}`
+      : "O link do Zoom foi enviado por e-mail."
+  );
+  const dates = `${toGoogleDate(booking.start_at)}/${toGoogleDate(booking.end_at)}`;
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}`;
+}
 
 export default async function ConfirmadoPage({
   searchParams,
@@ -34,16 +47,40 @@ export default async function ConfirmadoPage({
             </strong>
             .
           </p>
-          <p className="text-sm text-[var(--color-ink-soft)]">
+          <p className="text-sm text-[var(--color-ink-soft)] mb-8">
             Enviamos o link do Zoom para o seu e-mail. Se ele não aparecer em alguns minutos,
             confira também a caixa de spam.
           </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+            <a
+              href={googleCalendarUrl(booking)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] hover:border-[var(--color-teal)] transition-colors"
+            >
+              Adicionar ao Google Calendar
+            </a>
+            <a
+              href={`/api/bookings/${booking.id}/ics`}
+              className="rounded-lg border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] hover:border-[var(--color-teal)] transition-colors"
+            >
+              Baixar .ics (Apple/Outlook)
+            </a>
+          </div>
         </>
       ) : (
-        <p className="text-[var(--color-ink-soft)]">
+        <p className="text-[var(--color-ink-soft)] mb-8">
           Pagamento confirmado. Você receberá os detalhes por e-mail em instantes.
         </p>
       )}
+
+      <Link
+        href="/"
+        className="inline-block mt-4 rounded-lg bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors px-6 py-3 text-white text-sm font-semibold"
+      >
+        Voltar ao início
+      </Link>
     </main>
   );
 }
