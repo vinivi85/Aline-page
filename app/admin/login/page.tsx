@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -9,7 +8,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,8 +15,8 @@ export default function LoginPage() {
     setError(null);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       if (error.message.toLowerCase().includes("email not confirmed")) {
         setError("E-mail ainda não confirmado. Confirme o usuário no painel do Supabase (Authentication → Users) e tente de novo.");
       } else {
@@ -26,8 +24,9 @@ export default function LoginPage() {
       }
       return;
     }
-    router.push("/admin");
-    router.refresh();
+    // Navegação de página cheia (não client-side router) — garante que o cookie
+    // de sessão já esteja gravado antes do middleware checar a rota protegida.
+    window.location.href = "/admin";
   }
 
   return (
