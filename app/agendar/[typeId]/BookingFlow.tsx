@@ -18,6 +18,7 @@ import {
   startOfDay,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Link from "next/link";
 
 type SessionType = {
   id: string;
@@ -123,6 +124,12 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12 sm:py-20">
+      <Link
+        href="/agendar"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-teal)] mb-6 hover:underline"
+      >
+        ← Voltar para os tipos de sessão
+      </Link>
       <div className="grid gap-10 sm:grid-cols-[280px_1fr]">
         {/* Painel esquerdo: detalhes da sessão */}
         <div className="border-b sm:border-b-0 sm:border-r border-[var(--color-border)] pb-8 sm:pb-0 sm:pr-8">
