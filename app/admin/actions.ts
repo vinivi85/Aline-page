@@ -59,6 +59,27 @@ export async function toggleMonth(period: string, enabled: boolean) {
   revalidatePath("/agendar");
 }
 
+export async function approveCancellation(requestId: string, bookingId: string) {
+  const supabase = createServiceClient();
+  await supabase
+    .from("cancellation_requests")
+    .update({ status: "approved", resolved_at: new Date().toISOString() })
+    .eq("id", requestId);
+  await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bookingId);
+  revalidatePath("/admin/notificacoes");
+  revalidatePath("/admin");
+  revalidatePath("/agendar");
+}
+
+export async function rejectCancellation(requestId: string) {
+  const supabase = createServiceClient();
+  await supabase
+    .from("cancellation_requests")
+    .update({ status: "rejected", resolved_at: new Date().toISOString() })
+    .eq("id", requestId);
+  revalidatePath("/admin/notificacoes");
+}
+
 export async function addAvailabilityRule(formData: FormData) {
   const supabase = createServiceClient();
   await supabase.from("availability_rules").insert({

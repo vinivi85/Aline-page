@@ -68,6 +68,14 @@ export default async function ConfirmadoPage({
               Baixar .ics (Apple/Outlook)
             </a>
           </div>
+
+          <p className="text-xs text-[var(--color-ink-soft)] mb-8">
+            Precisa remarcar ou cancelar depois?{" "}
+            <a href={`/agendar/gerenciar/${booking.manage_token}`} className="text-[var(--color-teal)] underline">
+              Guarde este link
+            </a>{" "}
+            pra gerenciar sua sessão (também vai no e-mail de confirmação).
+          </p>
         </>
       ) : (
         <p className="text-[var(--color-ink-soft)] mb-8">

@@ -96,3 +96,22 @@ create table month_availability (
   enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+-- Token único de gerenciamento (link que o cliente usa pra remarcar/cancelar
+-- sem precisar de login)
+alter table bookings add column manage_token uuid not null default gen_random_uuid();
+create unique index idx_bookings_manage_token on bookings(manage_token);
+
+-- Registro de quantas vezes uma sessão já foi remarcada (referência/auditoria)
+alter table bookings add column rescheduled_count int not null default 0;
+
+-- Solicitações de cancelamento — ficam pendentes até a Aline aprovar ou recusar
+create table cancellation_requests (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid not null references bookings(id),
+  reason text not null,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz
+);
+create index idx_cancellation_requests_status on cancellation_requests(status);

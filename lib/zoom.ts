@@ -67,3 +67,30 @@ export async function createZoomMeeting(params: {
     startUrl: meeting.start_url as string,
   };
 }
+
+export async function updateZoomMeetingTime(params: {
+  meetingId: string;
+  startTimeISO: string;
+  durationMinutes: number;
+  timezone: string;
+}) {
+  const token = await getZoomAccessToken();
+
+  const res = await fetch(`https://api.zoom.us/v2/meetings/${params.meetingId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      start_time: params.startTimeISO,
+      duration: params.durationMinutes,
+      timezone: params.timezone,
+    }),
+  });
+
+  // Zoom retorna 204 sem corpo quando dá certo
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`Falha ao atualizar reunião Zoom: ${res.status} ${await res.text()}`);
+  }
+}
