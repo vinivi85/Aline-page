@@ -1,20 +1,39 @@
 import { createServiceClient } from "@/lib/supabase/server";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, subDays, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import AdminCalendar from "./AdminCalendar";
 
 export default async function AdminDashboard() {
   const supabase = createServiceClient();
-  const { data: bookings } = await supabase
+
+  // janela ampla o suficiente pra cobrir navegação de meses vizinhos no calendário
+  const rangeStart = subDays(new Date(), 45).toISOString();
+  const rangeEnd = addDays(new Date(), 90).toISOString();
+
+  const { data: calendarBookings } = await supabase
+    .from("bookings")
+    .select("id, start_at, status, zoom_join_url, zoom_start_url, session_types(name), clients(name, email)")
+    .gte("start_at", rangeStart)
+    .lte("start_at", rangeEnd)
+    .order("start_at", { ascending: true });
+
+  const { data: upcoming } = await supabase
     .from("bookings")
     .select("*, session_types(name), clients(name, email)")
     .in("status", ["confirmed", "pending_payment"])
-    .order("start_at", { ascending: true });
+    .gte("start_at", new Date().toISOString())
+    .order("start_at", { ascending: true })
+    .limit(10);
 
   return (
     <div>
-      <h1 className="font-display text-2xl mb-6 text-[var(--color-ink)]">Próximos agendamentos</h1>
+      <h1 className="font-display text-2xl mb-6 text-[var(--color-ink)]">Agendamentos</h1>
+
+      <AdminCalendar bookings={(calendarBookings ?? []) as any} />
+
+      <h2 className="font-display text-lg mb-3 text-[var(--color-ink)]">Próximos agendamentos</h2>
       <div className="flex flex-col gap-2">
-        {(bookings ?? []).map((b: any) => (
+        {(upcoming ?? []).map((b: any) => (
           <div
             key={b.id}
             className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
@@ -40,7 +59,7 @@ export default async function AdminDashboard() {
                 <a
                   href={b.zoom_start_url ?? b.zoom_join_url}
                   target="_blank"
-                  className="text-sm text-[var(--color-wine)]"
+                  className="text-sm text-[var(--color-teal)]"
                 >
                   Link Zoom
                 </a>
@@ -48,7 +67,7 @@ export default async function AdminDashboard() {
             </div>
           </div>
         ))}
-        {(bookings ?? []).length === 0 && (
+        {(upcoming ?? []).length === 0 && (
           <p className="text-[var(--color-ink-soft)] text-sm">Nenhum agendamento no momento.</p>
         )}
       </div>
