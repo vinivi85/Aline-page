@@ -115,3 +115,10 @@ create table cancellation_requests (
   resolved_at timestamptz
 );
 create index idx_cancellation_requests_status on cancellation_requests(status);
+
+-- Inscrições na newsletter (home page)
+create table newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  created_at timestamptz not null default now()
+);

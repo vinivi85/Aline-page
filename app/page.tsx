@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import NewsletterForm from "./NewsletterForm";
 
 export default function Home() {
   return (
@@ -75,6 +76,19 @@ export default function Home() {
           >
             Ver horários disponíveis →
           </Link>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="px-6 py-16 bg-[var(--color-teal-light)] text-center">
+        <div className="max-w-md mx-auto">
+          <h2 className="font-display text-2xl font-semibold text-[var(--color-ink)] mb-2">
+            Receba novidades por e-mail
+          </h2>
+          <p className="text-[var(--color-ink-soft)] text-sm mb-6">
+            Avisos de aulões, conteúdo novo e novidades da Aline direto na sua caixa de entrada.
+          </p>
+          <NewsletterForm />
         </div>
       </section>
 
