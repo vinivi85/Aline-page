@@ -109,8 +109,9 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     // libera o horário se o Stripe falhar
     await supabase.from("bookings").delete().eq("id", booking.id);
+    const message = err instanceof Error ? err.message : "Erro desconhecido.";
     return NextResponse.json(
-      { error: "Erro ao iniciar pagamento. Tente novamente." },
+      { error: `Erro ao iniciar pagamento: ${message}` },
       { status: 500 }
     );
   }
