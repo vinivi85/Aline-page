@@ -26,7 +26,7 @@ export async function GET(
     return NextResponse.json({ error: "Agendamento não encontrado." }, { status: 404 });
   }
 
-  const title = escapeICS(`${booking.session_types?.name ?? "Sessão"} — Aline Vicente`);
+  const title = escapeICS(`${booking.session_types?.name ?? "Sessão"} — Aline Vicente Consultoria`);
   const description = escapeICS(
     booking.zoom_join_url
       ? `Link do Zoom: ${booking.zoom_join_url}`
@@ -36,7 +36,7 @@ export async function GET(
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Aline Vicente//Agendamento//PT",
+    "PRODID:-//Aline Vicente Consultoria//Agendamento//PT",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

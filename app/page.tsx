@@ -7,7 +7,7 @@ export default function Home() {
       {/* Nav simples */}
       <header className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
         <span className="font-display font-semibold text-lg text-[var(--color-teal-dark)]">
-          Aline Vicente
+          Aline Vicente Consultoria
         </span>
         <Link
           href="/agendar"
@@ -139,7 +139,7 @@ export default function Home() {
 
       {/* Rodapé */}
       <footer className="bg-[var(--color-teal-dark)] text-white/80 text-center py-8 px-6 text-sm">
-        © {new Date().getFullYear()} Aline Vicente. Todos os direitos reservados.
+        © {new Date().getFullYear()} Aline Vicente Consultoria. Todos os direitos reservados.
       </footer>
     </main>
   );

@@ -5,7 +5,7 @@ import { ptBR } from "date-fns/locale";
 
 function googleCalendarUrl(booking: any) {
   const toGoogleDate = (iso: string) => iso.replace(/[-:]/g, "").split(".")[0] + "Z";
-  const title = encodeURIComponent(`${booking.session_types?.name ?? "Sessão"} — Aline Vicente`);
+  const title = encodeURIComponent(`${booking.session_types?.name ?? "Sessão"} — Aline Vicente Consultoria`);
   const details = encodeURIComponent(
     booking.zoom_join_url
       ? `Link do Zoom: ${booking.zoom_join_url}`

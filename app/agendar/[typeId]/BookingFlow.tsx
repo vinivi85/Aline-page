@@ -126,7 +126,7 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
       <div className="grid gap-10 sm:grid-cols-[280px_1fr]">
         {/* Painel esquerdo: detalhes da sessão */}
         <div className="border-b sm:border-b-0 sm:border-r border-[var(--color-border)] pb-8 sm:pb-0 sm:pr-8">
-          <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente</p>
+          <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente Consultoria</p>
           <h1 className="font-display text-2xl mb-3 text-[var(--color-ink)]">{sessionType.name}</h1>
           {sessionType.description && (
             <p className="text-[var(--color-ink-soft)] text-sm mb-4">{sessionType.description}</p>

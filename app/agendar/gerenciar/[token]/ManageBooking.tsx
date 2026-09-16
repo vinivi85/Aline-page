@@ -139,7 +139,7 @@ export default function ManageBooking({
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16 sm:py-24">
-      <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente</p>
+      <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente Consultoria</p>
       <h1 className="font-display text-2xl mb-6 text-[var(--color-ink)]">Sua sessão</h1>
 
       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">

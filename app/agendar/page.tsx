@@ -13,7 +13,7 @@ export default async function AgendarPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
-      <p className="text-sm tracking-wide text-[var(--color-wine)] mb-3">Aline Vicente</p>
+      <p className="text-sm tracking-wide text-[var(--color-wine)] mb-3">Aline Vicente Consultoria</p>
       <h1 className="font-display text-4xl sm:text-5xl leading-tight mb-4 text-[var(--color-ink)]">
         Vamos marcar sua sessão
       </h1>

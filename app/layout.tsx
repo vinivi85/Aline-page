@@ -14,7 +14,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Aline Vicente",
+  title: "Aline Vicente Consultoria",
   description:
     "Mãe, terapeuta (RBT) e educadora sobre autismo. Conteúdo baseado em evidências e mentorias para famílias.",
 };
