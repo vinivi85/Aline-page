@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const LINKS = [
   { href: "/admin", label: "Agendamentos", icon: "📅" },
@@ -11,6 +12,12 @@ const LINKS = [
   { href: "/admin/tipos", label: "Tipos de sessão", icon: "🏷️" },
   { href: "/admin/disponibilidade", label: "Disponibilidade", icon: "🗓️" },
 ];
+
+async function handleLogout() {
+  const supabase = createClient();
+  await supabase.auth.signOut();
+  window.location.href = "/admin/login";
+}
 
 export default function AdminSidebar({ pendingCount }: { pendingCount: number }) {
   const pathname = usePathname();
@@ -22,7 +29,7 @@ export default function AdminSidebar({ pendingCount }: { pendingCount: number })
         <span className="font-display text-lg text-[var(--color-ink)] px-2 mb-6">
           Painel · Aline
         </span>
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1 flex-1">
           {LINKS.map((link) => {
             const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
             return (
@@ -48,6 +55,14 @@ export default function AdminSidebar({ pendingCount }: { pendingCount: number })
             );
           })}
         </nav>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm text-[var(--color-ink-soft)] hover:bg-red-50 hover:text-red-600 transition-colors mt-2"
+        >
+          <span aria-hidden>🚪</span>
+          Sair
+        </button>
       </aside>
 
       {/* Barra horizontal — mobile */}
@@ -71,6 +86,9 @@ export default function AdminSidebar({ pendingCount }: { pendingCount: number })
             </Link>
           );
         })}
+        <button onClick={handleLogout} className="text-sm text-[var(--color-ink-soft)] shrink-0">
+          Sair
+        </button>
       </nav>
     </>
   );
