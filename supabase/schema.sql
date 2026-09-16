@@ -122,3 +122,8 @@ create table newsletter_subscribers (
   email text not null unique,
   created_at timestamptz not null default now()
 );
+
+-- Nome e telefone (com país) na newsletter
+alter table newsletter_subscribers add column if not exists name text;
+alter table newsletter_subscribers add column if not exists phone text;
+alter table newsletter_subscribers add column if not exists phone_country text default 'BR';
