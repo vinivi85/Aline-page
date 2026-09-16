@@ -6,16 +6,24 @@ export default function Home() {
   return (
     <main>
       {/* Nav simples */}
-      <header className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
+      <header className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto gap-3">
         <span className="font-display font-semibold text-lg text-[var(--color-teal-dark)]">
           Aline Vicente Consultoria
         </span>
-        <Link
-          href="/agendar"
-          className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5"
-        >
-          Agendar sessão
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/agendar/consultar"
+            className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-teal)] whitespace-nowrap"
+          >
+            Consultar agendamento
+          </Link>
+          <Link
+            href="/agendar"
+            className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5 whitespace-nowrap"
+          >
+            Agendar sessão
+          </Link>
+        </div>
       </header>
 
       {/* Sobre a Aline — logo no início, identidade em destaque */}
