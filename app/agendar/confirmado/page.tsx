@@ -55,8 +55,6 @@ export default async function ConfirmadoPage({
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
             <a
               href={googleCalendarUrl(booking)}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rounded-lg border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] hover:border-[var(--color-teal)] transition-colors"
             >
               Adicionar ao Google Calendar
@@ -65,7 +63,7 @@ export default async function ConfirmadoPage({
               href={`/api/bookings/${booking.id}/ics`}
               className="rounded-lg border border-[var(--color-border)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] hover:border-[var(--color-teal)] transition-colors"
             >
-              Baixar .ics (Apple/Outlook)
+              Adicionar ao Apple/Outlook (.ics)
             </a>
           </div>
 
