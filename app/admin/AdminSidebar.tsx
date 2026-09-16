@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/admin/notificacoes", label: "Notificações", icon: "🔔" },
   { href: "/admin/financeiro", label: "Financeiro", icon: "💳" },
   { href: "/admin/historico", label: "Histórico", icon: "🕘" },
+  { href: "/admin/newsletter", label: "Newsletter", icon: "✉️" },
   { href: "/admin/tipos", label: "Tipos de sessão", icon: "🏷️" },
   { href: "/admin/disponibilidade", label: "Disponibilidade", icon: "🗓️" },
 ];
