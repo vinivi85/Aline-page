@@ -5,7 +5,15 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type Match = { token: string; sessionName: string; startAt: string; clientName: string };
+type Match = { token: string; sessionName: string; startAt: string; clientName: string; status: string };
+
+const STATUS_LABELS: Record<string, string> = {
+  confirmed: "Confirmado",
+  pending_payment: "Aguardando pagamento",
+  cancelled: "Cancelado",
+  completed: "Realizado",
+  no_show: "Não compareceu",
+};
 
 export default function ConsultarPage() {
   const [name, setName] = useState("");
@@ -110,6 +118,9 @@ export default function ConsultarPage() {
                 <p className="text-xs text-[var(--color-ink-soft)] capitalize">
                   {format(parseISO(m.startAt), "d 'de' MMMM, HH:mm", { locale: ptBR })} · {m.clientName}
                 </p>
+                <span className="inline-block mt-1 text-[10px] rounded-full bg-[var(--color-teal-light)] text-[var(--color-teal-dark)] px-2 py-0.5">
+                  {STATUS_LABELS[m.status] ?? m.status}
+                </span>
               </a>
             ))}
           </div>

@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
     .select("id, start_at, manage_token, status, session_types(name), clients!inner(name, email)")
     .gte("start_at", dayStart)
     .lte("start_at", dayEnd)
-    .eq("status", "confirmed")
     .filter("clients.name", "ilike", `%${name.trim()}%`);
 
   if (error) {
@@ -44,6 +43,7 @@ export async function POST(req: NextRequest) {
       sessionName: b.session_types?.name,
       startAt: b.start_at,
       clientName: b.clients?.name,
+      status: b.status,
     })),
   });
 }
