@@ -149,7 +149,10 @@ export default function ManageBooking({
         ← Voltar para a consulta
       </Link>
       <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente Consultoria</p>
-      <h1 className="font-display text-2xl mb-6 text-[var(--color-ink)]">Sua sessão</h1>
+      <h1 className="font-display text-2xl mb-1 text-[var(--color-ink)]">
+        Bem-vindo(a), {booking.clients?.name?.split(" ")[0] ?? "de volta"}!
+      </h1>
+      <p className="text-sm text-[var(--color-ink-soft)] mb-6">Segue os detalhes da sua sessão.</p>
 
       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">
         <p className="font-medium text-[var(--color-ink)] mb-1">{booking.session_types?.name}</p>

@@ -104,7 +104,10 @@ export default function ConsultarPage() {
 
       {matches && matches.length > 0 && (
         <div className="mt-8">
-          <p className="text-sm text-[var(--color-ink-soft)] mb-3">
+          <p className="font-display text-lg text-[var(--color-ink)] mb-1">
+            Bem-vindo(a), {matches[0].clientName?.split(" ")[0] ?? "de volta"}!
+          </p>
+          <p className="text-sm text-[var(--color-ink-soft)] mb-4">
             Encontramos mais de uma sessão nessa data — escolha a certa:
           </p>
           <div className="flex flex-col gap-2">
