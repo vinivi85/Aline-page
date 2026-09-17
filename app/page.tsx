@@ -10,20 +10,12 @@ export default function Home() {
         <span className="font-display font-semibold text-lg text-[var(--color-teal-dark)]">
           Aline Vicente Consultoria
         </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/agendar/consultar"
-            className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-teal)] whitespace-nowrap"
-          >
-            Consultar agendamento
-          </Link>
-          <Link
-            href="/agendar"
-            className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5 whitespace-nowrap"
-          >
-            Agendar sessão
-          </Link>
-        </div>
+        <Link
+          href="/agendar"
+          className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5 whitespace-nowrap"
+        >
+          Agendar sessão
+        </Link>
       </header>
 
       {/* Sobre a Aline — logo no início, identidade em destaque */}
@@ -84,6 +76,14 @@ export default function Home() {
           >
             Ver horários disponíveis →
           </Link>
+          <div>
+            <Link
+              href="/agendar/consultar"
+              className="inline-block mt-4 rounded-full bg-white/15 hover:bg-white/25 transition-colors text-white font-medium px-6 py-2.5 text-sm border border-white/30"
+            >
+              Consultar agendamento
+            </Link>
+          </div>
         </div>
       </section>
 
