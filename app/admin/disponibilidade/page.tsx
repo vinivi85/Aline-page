@@ -2,16 +2,18 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { addAvailabilityRule, deleteAvailabilityRule, addOverride, deleteOverride, toggleMonth } from "../actions";
 import { format, parseISO, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import TimezoneSelect from "./TimezoneSelect";
 
 const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const MONTHS_AHEAD = 12;
 
 export default async function DisponibilidadePage() {
   const supabase = createServiceClient();
-  const [{ data: rules }, { data: overrides }, { data: monthRows }] = await Promise.all([
+  const [{ data: rules }, { data: overrides }, { data: monthRows }, { data: settingsRow }] = await Promise.all([
     supabase.from("availability_rules").select("*").order("day_of_week"),
     supabase.from("availability_overrides").select("*").order("date"),
     supabase.from("month_availability").select("*"),
+    supabase.from("booking_settings").select("timezone").eq("id", 1).single(),
   ]);
 
   const disabledMonths = new Set(
@@ -34,6 +36,15 @@ export default async function DisponibilidadePage() {
         Defina os dias e horários recorrentes em que você atende, e bloqueie ou abra datas
         específicas quando precisar (férias, feriado, um horário extra pontual).
       </p>
+
+      <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Fuso horário</h2>
+      <p className="text-xs text-[var(--color-ink-soft)] mb-3">
+        Os horários que você define abaixo (e os que aparecem pro cliente) usam esse fuso como
+        referência.
+      </p>
+      <div className="mb-10">
+        <TimezoneSelect current={settingsRow?.timezone ?? "America/Sao_Paulo"} />
+      </div>
 
       <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Meses disponíveis</h2>
       <p className="text-xs text-[var(--color-ink-soft)] mb-3">

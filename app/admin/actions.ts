@@ -2,6 +2,8 @@
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { stripe } from "@/lib/stripe";
+import { deleteZoomMeeting } from "@/lib/zoom";
 
 export async function upsertSessionType(formData: FormData) {
   const supabase = createServiceClient();
@@ -52,6 +54,13 @@ export async function toggleAvailabilityRule(dayOfWeek: number, startTime: strin
   revalidatePath("/admin/disponibilidade");
 }
 
+export async function updateTimezone(timezone: string) {
+  const supabase = createServiceClient();
+  await supabase.from("booking_settings").update({ timezone }).eq("id", 1);
+  revalidatePath("/admin/disponibilidade");
+  revalidatePath("/agendar");
+}
+
 export async function toggleMonth(period: string, enabled: boolean) {
   const supabase = createServiceClient();
   await supabase.from("month_availability").upsert({ period, enabled }, { onConflict: "period" });
@@ -61,13 +70,48 @@ export async function toggleMonth(period: string, enabled: boolean) {
 
 export async function approveCancellation(requestId: string, bookingId: string) {
   const supabase = createServiceClient();
+
+  const { data: booking } = await supabase
+    .from("bookings")
+    .select("stripe_payment_intent_id, zoom_meeting_id")
+    .eq("id", bookingId)
+    .single();
+
+  let refundStatus: "none" | "refunded" | "failed" = "none";
+  let refundedAt: string | null = null;
+
+  if (booking?.stripe_payment_intent_id) {
+    try {
+      await stripe.refunds.create({ payment_intent: booking.stripe_payment_intent_id });
+      refundStatus = "refunded";
+      refundedAt = new Date().toISOString();
+    } catch (err) {
+      console.error("Falha ao estornar no Stripe:", err);
+      refundStatus = "failed";
+    }
+  }
+
   await supabase
     .from("cancellation_requests")
     .update({ status: "approved", resolved_at: new Date().toISOString() })
     .eq("id", requestId);
-  await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bookingId);
+  await supabase
+    .from("bookings")
+    .update({ status: "cancelled", refund_status: refundStatus, refunded_at: refundedAt })
+    .eq("id", bookingId);
+
+  if (booking?.zoom_meeting_id) {
+    try {
+      await deleteZoomMeeting(booking.zoom_meeting_id);
+    } catch (err) {
+      console.error("Falha ao excluir reunião Zoom:", err);
+    }
+  }
+
   revalidatePath("/admin/notificacoes");
   revalidatePath("/admin");
+  revalidatePath("/admin/financeiro");
+  revalidatePath("/admin/historico");
   revalidatePath("/agendar");
 }
 

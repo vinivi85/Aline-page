@@ -130,7 +130,15 @@ export default function AdminBookingDetail({ booking: initialBooking }: { bookin
         return;
       }
       setBooking({ ...booking, status: "cancelled" });
-      setSuccess("Sessão cancelada.");
+      if (data.refundStatus === "refunded") {
+        setSuccess("Sessão cancelada e valor estornado no Stripe.");
+      } else if (data.refundStatus === "failed") {
+        setSuccess(
+          `Sessão cancelada, mas o estorno automático falhou (${data.refundError ?? "erro desconhecido"}). Faça o estorno manualmente no Stripe.`
+        );
+      } else {
+        setSuccess("Sessão cancelada.");
+      }
       setMode("view");
       setSubmitting(false);
     } catch {

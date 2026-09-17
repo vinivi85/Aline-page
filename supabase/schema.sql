@@ -127,3 +127,12 @@ create table newsletter_subscribers (
 alter table newsletter_subscribers add column if not exists name text;
 alter table newsletter_subscribers add column if not exists phone text;
 alter table newsletter_subscribers add column if not exists phone_country text default 'BR';
+
+-- Rastreio de estorno (Stripe não estorna automaticamente ao cancelar —
+-- precisa ser feito explicitamente via API, e aqui fica registrado o resultado)
+alter table bookings add column if not exists refund_status text not null default 'none'
+  check (refund_status in ('none', 'refunded', 'failed'));
+alter table bookings add column if not exists refunded_at timestamptz;
+
+-- Fuso horário padrão: Brasília
+update booking_settings set timezone = 'America/Sao_Paulo' where id = 1;

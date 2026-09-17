@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { deleteZoomMeeting } from "@/lib/zoom";
+import { stripe } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const user = await requireAdmin();
@@ -30,9 +31,32 @@ export async function POST(req: NextRequest) {
     ? `${booking.client_notes ?? ""}\n[Cancelado pelo admin: ${reason}]`.trim()
     : `${booking.client_notes ?? ""}\n[Cancelado pelo admin]`.trim();
 
+  // Estorno no Stripe — o Stripe NÃO estorna automaticamente só porque
+  // cancelamos no nosso banco, então chamamos a API de refund explicitamente.
+  let refundStatus: "none" | "refunded" | "failed" = "none";
+  let refundedAt: string | null = null;
+  let refundError: string | null = null;
+
+  if (booking.stripe_payment_intent_id) {
+    try {
+      await stripe.refunds.create({ payment_intent: booking.stripe_payment_intent_id });
+      refundStatus = "refunded";
+      refundedAt = new Date().toISOString();
+    } catch (err) {
+      console.error("Falha ao estornar no Stripe:", err);
+      refundStatus = "failed";
+      refundError = err instanceof Error ? err.message : "Erro desconhecido no estorno.";
+    }
+  }
+
   const { error: updateError } = await supabase
     .from("bookings")
-    .update({ status: "cancelled", client_notes: note })
+    .update({
+      status: "cancelled",
+      client_notes: note,
+      refund_status: refundStatus,
+      refunded_at: refundedAt,
+    })
     .eq("id", bookingId);
 
   if (updateError) {
@@ -47,5 +71,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    refundStatus,
+    refundError,
+  });
 }
