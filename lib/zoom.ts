@@ -94,3 +94,16 @@ export async function updateZoomMeetingTime(params: {
     throw new Error(`Falha ao atualizar reunião Zoom: ${res.status} ${await res.text()}`);
   }
 }
+
+export async function deleteZoomMeeting(meetingId: string) {
+  const token = await getZoomAccessToken();
+
+  const res = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok && res.status !== 204 && res.status !== 404) {
+    throw new Error(`Falha ao excluir reunião Zoom: ${res.status} ${await res.text()}`);
+  }
+}

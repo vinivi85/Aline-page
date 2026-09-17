@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   format,
   parseISO,
@@ -46,6 +47,7 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
 };
 
 export default function AdminCalendar({ bookings }: { bookings: Booking[] }) {
+  const router = useRouter();
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
   const [selectedDay, setSelectedDay] = useState<Date>(() => new Date());
 
@@ -144,7 +146,8 @@ export default function AdminCalendar({ bookings }: { bookings: Booking[] }) {
             return (
               <div
                 key={b.id}
-                className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
+                onClick={() => router.push(`/admin/agendamentos/${b.id}`)}
+                className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 cursor-pointer hover:border-[var(--color-teal)]"
               >
                 <div>
                   <p className="text-sm font-medium text-[var(--color-ink)]">
@@ -158,6 +161,7 @@ export default function AdminCalendar({ bookings }: { bookings: Booking[] }) {
                     <a
                       href={b.zoom_start_url ?? b.zoom_join_url}
                       target="_blank"
+                      onClick={(e) => e.stopPropagation()}
                       className="text-sm text-[var(--color-teal)]"
                     >
                       Zoom

@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import HistoricoRow from "./HistoricoRow";
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   confirmed: { label: "Confirmado", className: "bg-[var(--color-teal-light)] text-[var(--color-teal-dark)]" },
@@ -26,7 +27,8 @@ export default async function HistoricoPage() {
       <h1 className="font-display text-2xl mb-1 text-[var(--color-ink)]">Histórico</h1>
       <p className="text-xs text-[var(--color-ink-soft)] mb-6">
         Todos os agendamentos já feitos, de qualquer status — inclusive cancelados e aguardando
-        pagamento. Pra ver só os pagamentos confirmados, use a aba Financeiro.
+        pagamento. Pra ver só os pagamentos confirmados, use a aba Financeiro. Clique numa linha
+        pra abrir, remarcar ou cancelar.
       </p>
 
       <div className="overflow-x-auto">
@@ -44,7 +46,7 @@ export default async function HistoricoPage() {
             {all.map((b: any) => {
               const status = STATUS_LABELS[b.status] ?? { label: b.status, className: "bg-gray-100 text-gray-600" };
               return (
-                <tr key={b.id} className="border-b border-[var(--color-border)]">
+                <HistoricoRow key={b.id} bookingId={b.id}>
                   <td className="py-2 pr-3 text-[var(--color-ink)] capitalize whitespace-nowrap">
                     {format(parseISO(b.start_at), "d MMM yyyy, HH:mm", { locale: ptBR })}
                   </td>
@@ -63,6 +65,7 @@ export default async function HistoricoPage() {
                       <a
                         href={b.zoom_start_url ?? b.zoom_join_url}
                         target="_blank"
+                        onClick={(e) => e.stopPropagation()}
                         className="text-[var(--color-teal)] text-xs"
                       >
                         Abrir
@@ -71,7 +74,7 @@ export default async function HistoricoPage() {
                       <span className="text-xs text-[var(--color-ink-soft)]">—</span>
                     )}
                   </td>
-                </tr>
+                </HistoricoRow>
               );
             })}
           </tbody>
