@@ -39,13 +39,14 @@ type Slot = { start: string; end: string };
 export default function ManageBooking({
   booking,
   token,
-  pendingCancellation,
+  pendingCancellation: initialPendingCancellation,
 }: {
   booking: Booking;
   token: string;
   pendingCancellation: boolean;
 }) {
   const [mode, setMode] = useState<"view" | "reschedule" | "cancel">("view");
+  const [pendingCancellation, setPendingCancellation] = useState(initialPendingCancellation);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
@@ -130,6 +131,7 @@ export default function ManageBooking({
         return;
       }
       setSuccess("Solicitação enviada! A Aline vai revisar e confirmar em breve.");
+      setPendingCancellation(true);
       setMode("view");
       setSubmitting(false);
     } catch {
