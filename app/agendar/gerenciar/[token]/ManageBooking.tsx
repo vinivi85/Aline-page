@@ -19,6 +19,7 @@ import {
   differenceInHours,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Link from "next/link";
 
 const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const MIN_HOURS_TO_RESCHEDULE = 24;
@@ -139,6 +140,12 @@ export default function ManageBooking({
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16 sm:py-24">
+      <Link
+        href="/agendar/consultar"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-teal)] mb-6 hover:underline"
+      >
+        ← Voltar para a consulta
+      </Link>
       <p className="text-sm text-[var(--color-teal)] mb-2">Aline Vicente Consultoria</p>
       <h1 className="font-display text-2xl mb-6 text-[var(--color-ink)]">Sua sessão</h1>
 
