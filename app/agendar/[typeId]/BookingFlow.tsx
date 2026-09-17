@@ -19,6 +19,7 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Link from "next/link";
+import { formatDualTime, formatDualRange } from "@/lib/timezones";
 
 type SessionType = {
   id: string;
@@ -155,8 +156,10 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                 {format(parseISO(selectedSlot.start), "EEEE, d 'de' MMMM", { locale: ptBR })}
               </p>
               <p className="text-sm text-[var(--color-ink-soft)]">
-                {format(parseISO(selectedSlot.start), "HH:mm")} –{" "}
-                {format(parseISO(selectedSlot.end), "HH:mm")}
+                🇧🇷 {formatDualRange(selectedSlot.start, selectedSlot.end).br} (Brasília)
+              </p>
+              <p className="text-sm text-[var(--color-ink-soft)]">
+                🇺🇸 {formatDualRange(selectedSlot.start, selectedSlot.end).us} (Texas)
               </p>
             </div>
           )}
@@ -242,23 +245,30 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
 
               {selectedDay && (
                 <div>
-                  <h3 className="font-display text-lg mb-3 text-[var(--color-ink)] capitalize">
+                  <h3 className="font-display text-lg mb-1 text-[var(--color-ink)] capitalize">
                     Horários em {format(selectedDay, "d 'de' MMMM", { locale: ptBR })}
                   </h3>
+                  <p className="text-xs text-[var(--color-ink-soft)] mb-3">
+                    🇧🇷 Horário de Brasília / 🇺🇸 Horário do Texas
+                  </p>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {timesForSelectedDay.map((s) => (
-                      <button
-                        key={s.start}
-                        onClick={() => setSelectedSlot(s)}
-                        className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                          selectedSlot?.start === s.start
-                            ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
-                            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal)]"
-                        }`}
-                      >
-                        {format(parseISO(s.start), "HH:mm")}
-                      </button>
-                    ))}
+                    {timesForSelectedDay.map((s) => {
+                      const { br, us } = formatDualTime(s.start);
+                      return (
+                        <button
+                          key={s.start}
+                          onClick={() => setSelectedSlot(s)}
+                          className={`rounded-lg border px-3 py-2 text-sm transition-colors leading-tight ${
+                            selectedSlot?.start === s.start
+                              ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
+                              : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal)]"
+                          }`}
+                        >
+                          <span className="block">{br}</span>
+                          <span className="block text-[10px] opacity-70">{us} TX</span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <button

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDualTime } from "@/lib/timezones";
 
 type Match = { token: string; sessionName: string; startAt: string; clientName: string; status: string };
 
@@ -119,7 +120,10 @@ export default function ConsultarPage() {
               >
                 <p className="font-medium text-[var(--color-ink)]">{m.sessionName}</p>
                 <p className="text-xs text-[var(--color-ink-soft)] capitalize">
-                  {format(parseISO(m.startAt), "d 'de' MMMM, HH:mm", { locale: ptBR })} · {m.clientName}
+                  {format(parseISO(m.startAt), "d 'de' MMMM", { locale: ptBR })} · {m.clientName}
+                </p>
+                <p className="text-xs text-[var(--color-ink-soft)]">
+                  🇧🇷 {formatDualTime(m.startAt).br} · 🇺🇸 {formatDualTime(m.startAt).us}
                 </p>
                 <span className="inline-block mt-1 text-[10px] rounded-full bg-[var(--color-teal-light)] text-[var(--color-teal-dark)] px-2 py-0.5">
                   {STATUS_LABELS[m.status] ?? m.status}

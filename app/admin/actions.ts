@@ -61,6 +61,14 @@ export async function updateTimezone(timezone: string) {
   revalidatePath("/agendar");
 }
 
+export async function toggleBookingPaused(paused: boolean) {
+  const supabase = createServiceClient();
+  await supabase.from("booking_settings").update({ booking_paused: paused }).eq("id", 1);
+  revalidatePath("/admin/disponibilidade");
+  revalidatePath("/agendar");
+  revalidatePath("/");
+}
+
 export async function toggleMonth(period: string, enabled: boolean) {
   const supabase = createServiceClient();
   await supabase.from("month_availability").upsert({ period, enabled }, { onConflict: "period" });

@@ -1,8 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import NewsletterForm from "./NewsletterForm";
+import { createServiceClient } from "@/lib/supabase/server";
 
-export default function Home() {
+// Precisa ser dinâmica: o botão de agendar deve refletir a pausa de
+// atendimentos assim que o admin muda, sem esperar um novo deploy.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const supabase = createServiceClient();
+  const { data: settingsRow } = await supabase
+    .from("booking_settings")
+    .select("booking_paused")
+    .eq("id", 1)
+    .single();
+  const paused = settingsRow?.booking_paused ?? false;
+
   return (
     <main>
       {/* Nav simples */}
@@ -10,12 +23,18 @@ export default function Home() {
         <span className="font-display font-semibold text-lg text-[var(--color-teal-dark)]">
           Aline Vicente Consultoria
         </span>
-        <Link
-          href="/agendar"
-          className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5 whitespace-nowrap"
-        >
-          Agendar sessão
-        </Link>
+        {paused ? (
+          <span className="rounded-full bg-gray-200 text-gray-500 text-sm font-semibold px-5 py-2.5 whitespace-nowrap cursor-not-allowed">
+            Agendamentos pausados
+          </span>
+        ) : (
+          <Link
+            href="/agendar"
+            className="rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white text-sm font-semibold px-5 py-2.5 whitespace-nowrap"
+          >
+            Agendar sessão
+          </Link>
+        )}
       </header>
 
       {/* Sobre a Aline — logo no início, identidade em destaque */}
@@ -70,12 +89,18 @@ export default function Home() {
             Sessões individuais de mentoria, com base em evidências científicas e na vivência de
             quem passa por isso todos os dias.
           </p>
-          <Link
-            href="/agendar"
-            className="inline-block rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white font-semibold px-8 py-3.5"
-          >
-            Ver horários disponíveis →
-          </Link>
+          {paused ? (
+            <p className="inline-block rounded-full bg-white/15 text-white/70 font-medium px-8 py-3.5">
+              Atendimentos pausados no momento — volte em breve
+            </p>
+          ) : (
+            <Link
+              href="/agendar"
+              className="inline-block rounded-full bg-[var(--color-orange)] hover:bg-[var(--color-orange-dark)] transition-colors text-white font-semibold px-8 py-3.5"
+            >
+              Ver horários disponíveis →
+            </Link>
+          )}
           <div>
             <Link
               href="/agendar/consultar"

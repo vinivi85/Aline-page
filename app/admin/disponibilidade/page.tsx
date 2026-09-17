@@ -3,6 +3,7 @@ import { addAvailabilityRule, deleteAvailabilityRule, addOverride, deleteOverrid
 import { format, parseISO, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import TimezoneSelect from "./TimezoneSelect";
+import BookingPauseToggle from "./BookingPauseToggle";
 
 const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const MONTHS_AHEAD = 12;
@@ -13,7 +14,7 @@ export default async function DisponibilidadePage() {
     supabase.from("availability_rules").select("*").order("day_of_week"),
     supabase.from("availability_overrides").select("*").order("date"),
     supabase.from("month_availability").select("*"),
-    supabase.from("booking_settings").select("timezone").eq("id", 1).single(),
+    supabase.from("booking_settings").select("timezone, booking_paused").eq("id", 1).single(),
   ]);
 
   const disabledMonths = new Set(
@@ -36,6 +37,15 @@ export default async function DisponibilidadePage() {
         Defina os dias e horários recorrentes em que você atende, e bloqueie ou abra datas
         específicas quando precisar (férias, feriado, um horário extra pontual).
       </p>
+
+      <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Pausar agendamentos</h2>
+      <p className="text-xs text-[var(--color-ink-soft)] mb-3">
+        Desativa o botão de agendar na home (o cliente ainda consegue consultar, remarcar ou
+        cancelar sessões já feitas). Use pra dar uma pausa nos atendimentos.
+      </p>
+      <div className="mb-10">
+        <BookingPauseToggle paused={settingsRow?.booking_paused ?? false} />
+      </div>
 
       <h2 className="font-display text-lg mb-1 text-[var(--color-ink)]">Fuso horário</h2>
       <p className="text-xs text-[var(--color-ink-soft)] mb-3">

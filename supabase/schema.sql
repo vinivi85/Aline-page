@@ -136,3 +136,6 @@ alter table bookings add column if not exists refunded_at timestamptz;
 
 -- Fuso horário padrão: Brasília
 update booking_settings set timezone = 'America/Sao_Paulo' where id = 1;
+
+-- Pausa geral de novos agendamentos (mantém a consulta/gerenciamento ativos)
+alter table booking_settings add column if not exists booking_paused boolean not null default false;

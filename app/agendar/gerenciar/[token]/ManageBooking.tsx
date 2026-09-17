@@ -20,6 +20,7 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Link from "next/link";
+import { formatDualTime } from "@/lib/timezones";
 
 const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const MIN_HOURS_TO_RESCHEDULE = 24;
@@ -157,7 +158,11 @@ export default function ManageBooking({
       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">
         <p className="font-medium text-[var(--color-ink)] mb-1">{booking.session_types?.name}</p>
         <p className="text-sm text-[var(--color-ink-soft)] capitalize">
-          {format(parseISO(booking.start_at), "EEEE, d 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+          {format(parseISO(booking.start_at), "EEEE, d 'de' MMMM", { locale: ptBR })}
+        </p>
+        <p className="text-sm text-[var(--color-ink-soft)]">
+          🇧🇷 {formatDualTime(booking.start_at).br} (Brasília) · 🇺🇸{" "}
+          {formatDualTime(booking.start_at).us} (Texas)
         </p>
         <p className="text-xs text-[var(--color-ink-soft)] mt-2">
           Status: {booking.status === "confirmed" ? "Confirmado" : booking.status}
@@ -291,23 +296,30 @@ export default function ManageBooking({
 
               {selectedDay && (
                 <div className="mb-6">
-                  <h3 className="font-display text-base mb-3 text-[var(--color-ink)] capitalize">
+                  <h3 className="font-display text-base mb-1 text-[var(--color-ink)] capitalize">
                     Horários em {format(selectedDay, "d 'de' MMMM", { locale: ptBR })}
                   </h3>
+                  <p className="text-xs text-[var(--color-ink-soft)] mb-3">
+                    🇧🇷 Brasília / 🇺🇸 Texas
+                  </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {timesForSelectedDay.map((s) => (
-                      <button
-                        key={s.start}
-                        onClick={() => setSelectedSlot(s)}
-                        className={`rounded-lg border px-3 py-2 text-sm ${
-                          selectedSlot?.start === s.start
-                            ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
-                            : "border-[var(--color-border)] hover:border-[var(--color-teal)]"
-                        }`}
-                      >
-                        {format(parseISO(s.start), "HH:mm")}
-                      </button>
-                    ))}
+                    {timesForSelectedDay.map((s) => {
+                      const { br, us } = formatDualTime(s.start);
+                      return (
+                        <button
+                          key={s.start}
+                          onClick={() => setSelectedSlot(s)}
+                          className={`rounded-lg border px-3 py-2 text-sm leading-tight ${
+                            selectedSlot?.start === s.start
+                              ? "border-[var(--color-teal)] bg-[var(--color-teal)] text-white"
+                              : "border-[var(--color-border)] hover:border-[var(--color-teal)]"
+                          }`}
+                        >
+                          <span className="block">{br}</span>
+                          <span className="block text-[10px] opacity-70">{us} TX</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

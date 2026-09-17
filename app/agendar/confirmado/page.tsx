@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createServiceClient } from "@/lib/supabase/server";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDualTime } from "@/lib/timezones";
 
 function googleCalendarUrl(booking: any) {
   const toGoogleDate = (iso: string) => iso.replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -38,14 +39,18 @@ export default async function ConfirmadoPage({
 
       {booking ? (
         <>
-          <p className="text-[var(--color-ink-soft)] mb-6">
+          <p className="text-[var(--color-ink-soft)] mb-2">
             Sua sessão de <strong>{booking.session_types?.name}</strong> está marcada para{" "}
             <strong className="capitalize">
-              {format(parseISO(booking.start_at), "EEEE, d 'de' MMMM 'às' HH:mm", {
-                locale: ptBR,
-              })}
+              {format(parseISO(booking.start_at), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </strong>
             .
+          </p>
+          <p className="text-sm text-[var(--color-ink-soft)] mb-1">
+            🇧🇷 {formatDualTime(booking.start_at).br} (Brasília)
+          </p>
+          <p className="text-sm text-[var(--color-ink-soft)] mb-6">
+            🇺🇸 {formatDualTime(booking.start_at).us} (Texas)
           </p>
           <p className="text-sm text-[var(--color-ink-soft)] mb-8">
             Enviamos o link do Zoom para o seu e-mail. Se ele não aparecer em alguns minutos,
