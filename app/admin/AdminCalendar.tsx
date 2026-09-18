@@ -17,6 +17,7 @@ import {
   subMonths,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDualTime } from "@/lib/timezones";
 
 type Booking = {
   id: string;
@@ -151,9 +152,12 @@ export default function AdminCalendar({ bookings }: { bookings: Booking[] }) {
               >
                 <div>
                   <p className="text-sm font-medium text-[var(--color-ink)]">
-                    {format(parseISO(b.start_at), "HH:mm")} — {b.session_types?.name} · {b.clients?.name}
+                    {b.session_types?.name} · {b.clients?.name}
                   </p>
-                  <p className="text-xs text-[var(--color-ink-soft)]">{b.clients?.email}</p>
+                  <p className="text-xs text-[var(--color-ink-soft)]">
+                    🇧🇷 {formatDualTime(b.start_at).br} · 🇺🇸 {formatDualTime(b.start_at).us} ·{" "}
+                    {b.clients?.email}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-xs rounded-full px-2 py-1 ${status.className}`}>{status.label}</span>

@@ -38,6 +38,8 @@ type Booking = {
   status: string;
   payment_method: string | null;
   amount_paid_cents: number | null;
+  stripe_payment_intent_id: string | null;
+  refund_status: string | null;
   zoom_join_url: string | null;
   zoom_start_url: string | null;
   session_types: { id: string; name: string; duration_minutes: number; price_cents: number } | null;
@@ -148,6 +150,30 @@ export default function AdminBookingDetail({ booking: initialBooking }: { bookin
     }
   }
 
+  async function handleManualRefund() {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/bookings/refund", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: booking.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro ao estornar.");
+        setSubmitting(false);
+        return;
+      }
+      setBooking({ ...booking, refund_status: "refunded" });
+      setSuccess("Valor estornado no Stripe com sucesso.");
+      setSubmitting(false);
+    } catch {
+      setError("Não foi possível conectar. Tente novamente.");
+      setSubmitting(false);
+    }
+  }
+
   const status = STATUS_LABELS[booking.status] ?? { label: booking.status, className: "bg-gray-100 text-gray-600" };
 
   return (
@@ -202,9 +228,22 @@ export default function AdminBookingDetail({ booking: initialBooking }: { bookin
       )}
 
       {booking.status !== "confirmed" && mode === "view" && (
-        <p className="text-sm text-[var(--color-ink-soft)]">
-          Essa sessão não está mais ativa, então não dá pra remarcar ou cancelar por aqui.
-        </p>
+        <div>
+          <p className="text-sm text-[var(--color-ink-soft)] mb-3">
+            Essa sessão não está mais ativa, então não dá pra remarcar ou cancelar por aqui.
+          </p>
+          {booking.status === "cancelled" &&
+            booking.stripe_payment_intent_id &&
+            booking.refund_status !== "refunded" && (
+              <button
+                onClick={handleManualRefund}
+                disabled={submitting}
+                className="rounded-lg bg-red-600 hover:bg-red-700 transition-colors text-white text-sm font-semibold px-5 py-3 disabled:opacity-40"
+              >
+                {submitting ? "Estornando..." : "Estornar agora no Stripe"}
+              </button>
+            )}
+        </div>
       )}
 
       {booking.status === "confirmed" && mode === "view" && (
