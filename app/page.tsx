@@ -41,7 +41,7 @@ export default async function Home() {
       <section className="border-t-4 border-[var(--color-teal)] pt-14 pb-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="font-display text-3xl sm:text-4xl font-semibold text-[var(--color-ink)] mb-2">
-            Conheça a <span className="text-[var(--color-blue-accent)]">Aline Vicente</span>
+            Um espaço para conversar, entender e encontrar caminhos
           </h1>
           <div className="w-16 h-1 bg-[var(--color-blue-accent)] rounded-full mx-auto mb-10" />
 
@@ -55,22 +55,42 @@ export default async function Home() {
             />
           </div>
 
-          <div className="text-left sm:text-center text-[var(--color-ink-soft)] leading-relaxed flex flex-col gap-5 text-[15px] sm:text-base">
+          <div className="text-left text-[var(--color-ink-soft)] leading-relaxed flex flex-col gap-5 text-[15px] sm:text-base">
             <p>
-              Há nove anos, o autismo faz parte da minha rotina — não apenas nos livros ou nas
-              formações, mas dentro da minha própria casa. Sou mãe de uma menina autista e de uma
-              filha típica, o que me deu uma visão completa sobre desenvolvimento, comportamento,
-              irmãos e família.
+              Ser mãe traz muitas dúvidas — especialmente quando estamos tentando compreender
+              nossos filhos, seus comportamentos e também tudo o que essa jornada desperta em nós.
             </p>
             <p>
-              Ao longo desses anos, mergulhei nos estudos sobre o autismo, aprendi os princípios
-              da Análise do Comportamento Aplicada (ABA) e, hoje, atuo também no campo prático,
-              como terapeuta (RBT), acompanhando crianças e famílias diariamente.
+              Sou mãe, terapeuta comportamental e mestranda em Applied Behavior Analysis (ABA).
+              Minha experiência une dois lados que fazem parte da minha vida todos os dias: o
+              olhar de uma mãe e o conhecimento que venho construindo profissional e
+              academicamente na área do comportamento.
             </p>
             <p>
-              Minha missão é unir o que aprendi como mãe, como profissional e como educadora para
-              traduzir o autismo de forma clara, real e aplicável — sem promessas mágicas, mas com
-              estratégias que funcionam e respeito ao tempo de cada criança.
+              Criei esta mentoria para mães que sentem que precisam conversar com alguém que
+              entenda esse contexto e possa ajudá-las a organizar suas dúvidas e pensar em
+              possibilidades.
+            </p>
+            <p>Durante nosso encontro, podemos conversar sobre questões como:</p>
+            <ul className="list-disc pl-5 flex flex-col gap-2">
+              <li>comportamentos que estão sendo difíceis de compreender ou manejar no dia a dia;</li>
+              <li>rotina, autonomia e desafios familiares;</li>
+              <li>dúvidas sobre ABA, terapias e estratégias comportamentais;</li>
+              <li>comunicação e relacionamento com profissionais e escola;</li>
+              <li>maternidade e os desafios que você está vivendo;</li>
+              <li>
+                ou simplesmente uma situação específica em que você precisa de orientação e de um
+                novo olhar.
+              </li>
+            </ul>
+
+            <h2 className="font-display text-xl font-semibold text-[var(--color-ink)] mt-4">
+              Como funciona
+            </h2>
+            <p>
+              A mentoria é uma conversa individual e personalizada. Você traz aquilo que está
+              vivendo e, durante 45 minutos, vamos conversar sobre suas dúvidas, organizar o que
+              está acontecendo e pensar juntas em caminhos possíveis.
             </p>
           </div>
         </div>
