@@ -22,7 +22,7 @@ export default async function AgendarPage() {
       </Link>
       <p className="text-sm tracking-wide text-[var(--color-wine)] mb-3">Aline Vicente Consultoria</p>
       <h1 className="font-display text-4xl sm:text-5xl leading-tight mb-4 text-[var(--color-ink)]">
-        Vamos marcar sua sessão
+        Agende seu atendimento
       </h1>
 
       {paused ? (
