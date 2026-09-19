@@ -264,8 +264,8 @@ export default function BookingFlow({ sessionType }: { sessionType: SessionType 
                               : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal)]"
                           }`}
                         >
-                          <span className="block">{br}</span>
-                          <span className="block text-[10px] opacity-70">{us} TX</span>
+                          <span className="block">🇧🇷 {br}</span>
+                          <span className="block text-[10px] opacity-70">🇺🇸 {us}</span>
                         </button>
                       );
                     })}
