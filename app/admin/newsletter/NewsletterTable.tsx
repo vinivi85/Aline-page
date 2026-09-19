@@ -29,9 +29,11 @@ function escapeCsvField(value: string) {
   return value;
 }
 
-export default function NewsletterTable({ subscribers }: { subscribers: Subscriber[] }) {
+export default function NewsletterTable({ subscribers: initialSubscribers }: { subscribers: Subscriber[] }) {
+  const [subscribers, setSubscribers] = useState(initialSubscribers);
   const [sortColumn, setSortColumn] = useState<SortColumn>("created_at");
   const [sortAsc, setSortAsc] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const sorted = useMemo(() => {
     const copy = [...subscribers];
@@ -51,6 +53,27 @@ export default function NewsletterTable({ subscribers }: { subscribers: Subscrib
     } else {
       setSortColumn(col);
       setSortAsc(true);
+    }
+  }
+
+  async function handleDelete(id: string, label: string) {
+    if (!confirm(`Excluir o cadastro de ${label}? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
+    setDeletingId(id);
+    try {
+      const res = await fetch("/api/admin/newsletter/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) {
+        alert("Erro ao excluir o cadastro.");
+        return;
+      }
+      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -102,6 +125,7 @@ export default function NewsletterTable({ subscribers }: { subscribers: Subscrib
                   {col.label} {sortColumn === col.key ? (sortAsc ? "▲" : "▼") : ""}
                 </th>
               ))}
+              <th className="py-2 pr-3" />
             </tr>
           </thead>
           <tbody>
@@ -112,6 +136,15 @@ export default function NewsletterTable({ subscribers }: { subscribers: Subscrib
                 <td className="py-2 pr-3 text-[var(--color-ink-soft)]">{s.phone ?? "—"}</td>
                 <td className="py-2 pr-3 text-[var(--color-ink-soft)] whitespace-nowrap">
                   {format(parseISO(s.created_at), "d MMM yyyy, HH:mm", { locale: ptBR })}
+                </td>
+                <td className="py-2 pr-3 text-right">
+                  <button
+                    onClick={() => handleDelete(s.id, s.name ?? s.email)}
+                    disabled={deletingId === s.id}
+                    className="text-xs text-[var(--color-wine)] hover:underline disabled:opacity-40"
+                  >
+                    {deletingId === s.id ? "Excluindo..." : "Excluir"}
+                  </button>
                 </td>
               </tr>
             ))}
