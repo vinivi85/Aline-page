@@ -357,8 +357,8 @@ export default function AdminBookingDetail({ booking: initialBooking }: { bookin
                               : "border-[var(--color-border)] hover:border-[var(--color-teal)]"
                           }`}
                         >
-                          <span className="block">{br}</span>
-                          <span className="block text-[10px] opacity-70">{us} TX</span>
+                          <span className="block">🇧🇷 {br}</span>
+                          <span className="block text-[10px] opacity-70">🇺🇸 {us}</span>
                         </button>
                       );
                     })}
